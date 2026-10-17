@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (2026-10-17)
+
+
+### Features
+
+* init ([686942d](https://github.com/molokmax/ai-for-developers-project-387/commit/686942d07995d6c5a4429f49ed3afd4a6cb6cf73))
+
 ## [1.2.0](https://github.com/molokmax/ai-for-developers-project-386/compare/v1.1.0...v1.2.0) (2026-10-07)
 
 
