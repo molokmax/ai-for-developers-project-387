@@ -7,6 +7,7 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       id-token: write
       contents: write
@@ -35,6 +36,9 @@ jobs:
         if: steps.check.outputs.result == 'true'
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          # В CI некому подтверждать permission-промпты: без этого правила любое
+          # обращение агента за пределы workspace ставит ран на паузу до таймаута job'а.
+          OPENCODE_PERMISSION: '{"external_directory":"allow"}'
         with:
           model: opencode/deepseek-v4-flash
           prompt: |
