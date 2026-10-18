@@ -4,7 +4,7 @@ import { mockFetch, renderPage } from '../../test/helpers'
 import SettingsPage from './SettingsPage'
 
 describe('SettingsPage (настройки календаря)', () => {
-  it('показывает текущее окно записи и обеденный перерыв', async () => {
+  it('показывает текущее окно записи и перерыв', async () => {
     mockFetch([
       {
         url: '/api/settings',
@@ -49,7 +49,7 @@ describe('SettingsPage (настройки календаря)', () => {
     expect(await screen.findByText('Настройки сохранены')).toBeDefined()
   })
 
-  it('сохраняет обеденный перерыв в формате контракта', async () => {
+  it('сохраняет перерыв в формате контракта', async () => {
     const fetchMock = mockFetch([
       { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       {

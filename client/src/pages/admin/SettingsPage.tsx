@@ -46,7 +46,7 @@ export default function SettingsPage() {
         notifications.show({
           title: 'Настройки сохранены',
           message: response.data.lunchBreakStart
-            ? `Окно записи: ${response.data.bookingWindowDays} дней, обед: ${response.data.lunchBreakStart.slice(0, 5)}–${response.data.lunchBreakEnd?.slice(0, 5) ?? ''}`
+            ? `Окно записи: ${response.data.bookingWindowDays} дней, перерыв: ${response.data.lunchBreakStart.slice(0, 5)}–${response.data.lunchBreakEnd?.slice(0, 5) ?? ''}`
             : `Окно записи: ${response.data.bookingWindowDays} дней`,
           color: 'green'
         })
@@ -129,7 +129,7 @@ export default function SettingsPage() {
               }}
             />
             <Text c="dimmed">
-              Обеденный перерыв: промежуток внутри рабочего дня, в который гости не могут записаться.
+              Перерыв: промежуток внутри рабочего дня, в который гости не могут записаться.
               Оставьте поля пустыми, чтобы отключить перерыв.
             </Text>
             <TimeInput
