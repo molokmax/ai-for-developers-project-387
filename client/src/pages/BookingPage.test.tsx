@@ -140,6 +140,24 @@ describe('BookingPage (запись на слот)', () => {
     expect(slotsCalls.length).toBeGreaterThanOrEqual(2)
   })
 
+  it('оставляет стрелки навигации по месяцам активными в окне записи', async () => {
+    mockFetch([
+      { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/slots', status: 200, body: slots },
+    ])
+
+    const { container } = renderPage(<BookingPage />, { route: '/book/1', path: '/book/:eventTypeId' })
+
+    await screen.findByText('Вводный звонок')
+
+    const previous = container.querySelector<HTMLButtonElement>('[data-direction="previous"]')
+    const next = container.querySelector<HTMLButtonElement>('[data-direction="next"]')
+    expect(previous).not.toBeNull()
+    expect(next).not.toBeNull()
+    expect(previous!.disabled).toBe(false)
+    expect(next!.disabled).toBe(false)
+  })
+
   it('неизвестный тип события показывает сообщение 404', async () => {
     mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },

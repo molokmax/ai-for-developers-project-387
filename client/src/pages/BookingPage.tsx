@@ -75,6 +75,9 @@ export default function BookingPage() {
   const windowEnd = dayjs().add(BOOKING_WINDOW_DAYS - 1, 'day').format('YYYY-MM-DD')
   const activeDate = date ?? datesWithSlots[0] ?? today
   const daySlots = slotsByDate.get(activeDate) ?? []
+  // Даты вне окна записи отключаем через excludeDate, а не minDate/maxDate:
+  // иначе Mantine дизейблит стрелки навигации по месяцам целиком
+  const isOutsideWindow = (value: string) => value < today || value > windowEnd
 
   const bookingMutation = useMutation({
     mutationFn: (startUtc: string) =>
@@ -170,8 +173,7 @@ export default function BookingPage() {
                     setDate(value)
                     setSelectedSlot(null)
                   }}
-                  minDate={today}
-                  maxDate={windowEnd}
+                  excludeDate={isOutsideWindow}
                 />
                 <Text fw={600}>{dayjs(activeDate).format('DD.MM.YYYY')}</Text>
                 {daySlots.length === 0 ? (
