@@ -62,6 +62,20 @@ namespace CallCalendar.Api.Migrations
                     b.ToTable("Bookings");
                 });
 
+            modelBuilder.Entity("CallCalendar.Api.Data.Entities.CalendarSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BookingWindowDays")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CalendarSettings");
+                });
+
             modelBuilder.Entity("CallCalendar.Api.Data.Entities.EventType", b =>
                 {
                     b.Property<long>("Id")

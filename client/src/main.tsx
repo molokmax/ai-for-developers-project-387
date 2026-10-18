@@ -15,6 +15,7 @@ import BookingPage from './pages/BookingPage'
 import HomePage from './pages/HomePage'
 import EventTypesPage from './pages/admin/EventTypesPage'
 import MeetingsPage from './pages/admin/MeetingsPage'
+import SettingsPage from './pages/admin/SettingsPage'
 
 dayjs.locale('ru')
 
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
       { path: 'book/:eventTypeId', element: <BookingPage /> },
       { path: 'admin/event-types', element: <EventTypesPage /> },
       { path: 'admin/meetings', element: <MeetingsPage /> },
+      { path: 'admin/settings', element: <SettingsPage /> },
     ],
   },
 ])

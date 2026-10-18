@@ -10,7 +10,7 @@ using Dtos = CallCalendar.Api.Contracts.Contracts;
 
 namespace CallCalendar.Api.Endpoints;
 
-public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions calendar)
+public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions calendar, CalendarSettingsStore settings)
     : Bases.BookingsCreateEndpointBase
 {
     public override async Task<
@@ -51,8 +51,9 @@ public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions cale
         var nowUtc = DateTime.UtcNow;
         var duration = TimeSpan.FromMinutes(eventType.DurationMinutes);
         var startUtc = request.StartUtc.ToUniversalTime().UtcDateTime;
+        var bookingWindowDays = await settings.GetBookingWindowDaysAsync(cancellationToken);
 
-        if (!SlotGrid.IsStartAvailable(calendar.TimeZone, startUtc, duration, nowUtc, out var error))
+        if (!SlotGrid.IsStartAvailable(calendar.TimeZone, startUtc, duration, nowUtc, bookingWindowDays, out var error))
         {
             return TypedResults.BadRequest(ApiProblems.InvalidRequest(error));
         }

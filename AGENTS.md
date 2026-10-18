@@ -41,10 +41,11 @@ npm run api:gen:watch # watch-режим генерации SDK
 
 ## Бэкенд: нюансы
 
-- В Development при старте сами применяются миграции и сидируются типы событий (`DbSeeder`); `callcalendar.db` в gitignore
+- В Development при старте сами применяются миграции и сидируются типы событий и настройки календаря (`DbSeeder`); `callcalendar.db` в gitignore
 - Контракт-first: эндпоинты из спеки генерируются source-генератором MinimalOpenAPI (см. раздел «Контракт и генерация SDK»); хендлеры - ручные классы в `Endpoints/`, наследующие генерированные `*EndpointBase`; отсутствующая реализация ловится компилятором (MOA001)
 - Валидация запросов: DataAnnotations из генерированных контрактных records + свой `ValidationEndpointFilter` (400 + application/problem+json с ошибками по полям, вложенные объекты не рекурсируются). Встроенный `AddValidation` не применяется: он не видит типы из чужого source generator
-- Бизнес-правила (свободность слота, окно 14 дней, конфликт 409, идемпотентность по Idempotency-Key) в ручных хендлерах; сетка/окно в `Services/SlotGrid.cs`, часовой пояс владельца в `appsettings.json` (`Calendar:TimeZone`)
+- Бизнес-правила (свободность слота, окно записи, конфликт 409, идемпотентность по Idempotency-Key) в ручных хендлерах; сетка в `Services/SlotGrid.cs`, часовой пояс владельца в `appsettings.json` (`Calendar:TimeZone`)
+- Окно записи редактируемое: единственная строка настроек в БД (сущность `CalendarSettings`), читается через `Services/CalendarSettingsStore.cs`; значение по умолчанию задаётся `Calendar:BookingWindowDays` (дефолт 14, валидируется на старте) и используется `DbSeeder` при первом создании строки
 - Миграции из `src/CallCalendar.Api/`: `dotnet ef migrations add Name`; `**/Migrations/**` - генерируемый код, не править руками, style-правила там отключены
 - `public partial class Program;` в конце Program.cs нужен для `WebApplicationFactory<Program>`, не удалять
 - SQLite не транслирует сравнения DateTimeOffset: в сущностях DateTime (UTC, Kind восстанавливается конвертером), DateTimeOffset только на контрактной границе

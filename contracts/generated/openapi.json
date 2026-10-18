@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Календарь звонков API",
-    "description": "API сервиса записи на звонок.\nГость выбирает тип события и свободный слот в окне записи (14 календарных дней, включая текущий), владелец календаря управляет типами событий и смотрит предстоящие встречи.\nРегистрации и авторизации нет: административный раздел работает от имени единственного заранее заданного профиля владельца.\nВремя в API передаётся в UTC (ISO 8601); сетка слотов вычисляется на сервере в часовом поясе владельца (по умолчанию Europe/Moscow).",
+    "description": "API сервиса записи на звонок.\nГость выбирает тип события и свободный слот в окне записи (настраиваемое число календарных дней, включая текущий; по умолчанию 14), владелец календаря управляет типами событий, настройками и смотрит предстоящие встречи.\nРегистрации и авторизации нет: административный раздел работает от имени единственного заранее заданного профиля владельца.\nВремя в API передаётся в UTC (ISO 8601); сетка слотов вычисляется на сервере в часовом поясе владельца (по умолчанию Europe/Moscow).",
     "version": "0.0.0"
   },
   "tags": [
@@ -17,6 +17,9 @@
     },
     {
       "name": "Meetings"
+    },
+    {
+      "name": "Settings"
     }
   ],
   "paths": {
@@ -190,10 +193,72 @@
         ]
       }
     },
+    "/api/settings": {
+      "get": {
+        "operationId": "Settings_get",
+        "description": "Текущие настройки календаря владельца",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarSettings"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ]
+      },
+      "put": {
+        "operationId": "Settings_update",
+        "description": "Изменить настройки календаря (владелец календаря)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка валидации запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCalendarSettingsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/slots": {
       "get": {
         "operationId": "Slots_list",
-        "description": "Свободные слоты для типа события в окне записи: 14 календарных дней по времени владельца, включая текущий день (прошедшие слоты сегодня недоступны).\nСлот свободен, если его интервал не пересекается с интервалами существующих записей любых типов событий.",
+        "description": "Свободные слоты для типа события в окне записи: число календарных дней по времени владельца, включая текущий (по умолчанию 14; прошедшие слоты сегодня недоступны).\nСлот свободен, если его интервал не пересекается с интервалами существующих записей любых типов событий.",
         "parameters": [
           {
             "name": "eventTypeId",
@@ -283,6 +348,21 @@
           }
         },
         "description": "Запись: занятый слот с контактами гостя"
+      },
+      "CalendarSettings": {
+        "type": "object",
+        "required": [
+          "bookingWindowDays"
+        ],
+        "properties": {
+          "bookingWindowDays": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "description": "Окно записи в календарных днях, включая текущий: в его пределах гость может выбрать слот"
+          }
+        },
+        "description": "Настройки календаря владельца"
       },
       "CreateBookingRequest": {
         "type": "object",
@@ -487,6 +567,21 @@
           }
         },
         "description": "Свободный слот: возможное время начала записи"
+      },
+      "UpdateCalendarSettingsRequest": {
+        "type": "object",
+        "required": [
+          "bookingWindowDays"
+        ],
+        "properties": {
+          "bookingWindowDays": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "description": "Окно записи в календарных днях, включая текущий; минимум 1"
+          }
+        },
+        "description": "Запрос на изменение настроек календаря"
       }
     }
   }

@@ -3,13 +3,14 @@
  * Do not edit manually.
  * Календарь звонков API
  * API сервиса записи на звонок.
- * Гость выбирает тип события и свободный слот в окне записи (14 календарных дней, включая текущий), владелец календаря управляет типами событий и смотрит предстоящие встречи.
+ * Гость выбирает тип события и свободный слот в окне записи (настраиваемое число календарных дней, включая текущий; по умолчанию 14), владелец календаря управляет типами событий, настройками и смотрит предстоящие встречи.
  * Регистрации и авторизации нет: административный раздел работает от имени единственного заранее заданного профиля владельца.
  * Время в API передаётся в UTC (ISO 8601); сетка слотов вычисляется на сервере в часовом поясе владельца (по умолчанию Europe/Moscow).
  * OpenAPI spec version: 0.0.0
  */
 
 export * from './booking';
+export * from './calendarSettings';
 export * from './createBookingRequest';
 export * from './createEventTypeRequest';
 export * from './eventType';
@@ -18,3 +19,4 @@ export * from './meeting';
 export * from './problemDetails';
 export * from './slot';
 export * from './slotsListParams';
+export * from './updateCalendarSettingsRequest';

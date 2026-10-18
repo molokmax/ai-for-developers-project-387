@@ -43,6 +43,7 @@ describe('BookingPage (запись на слот)', () => {
   it('создаёт запись с Idempotency-Key и показывает подтверждение', async () => {
     const fetchMock = mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       { url: '/api/slots', status: 200, body: slots },
       { url: '/api/bookings', method: 'POST', status: 201, body: confirmedBooking },
     ])
@@ -75,6 +76,7 @@ describe('BookingPage (запись на слот)', () => {
   it('подсвечивает невалидные поля без отправки запроса', async () => {
     const fetchMock = mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       { url: '/api/slots', status: 200, body: slots },
     ])
 
@@ -91,6 +93,7 @@ describe('BookingPage (запись на слот)', () => {
   it('серверные ошибки 400 подсвечивает по полям формы', async () => {
     mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       { url: '/api/slots', status: 200, body: slots },
       {
         url: '/api/bookings',
@@ -117,6 +120,7 @@ describe('BookingPage (запись на слот)', () => {
   it('при 409 показывает уведомление и перезапрашивает слоты', async () => {
     const fetchMock = mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       { url: '/api/slots', status: 200, body: slots },
       {
         url: '/api/bookings',
@@ -143,6 +147,7 @@ describe('BookingPage (запись на слот)', () => {
   it('оставляет стрелки навигации по месяцам активными в окне записи', async () => {
     mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       { url: '/api/slots', status: 200, body: slots },
     ])
 
@@ -161,6 +166,7 @@ describe('BookingPage (запись на слот)', () => {
   it('неизвестный тип события показывает сообщение 404', async () => {
     mockFetch([
       { url: '/api/event-types', status: 200, body: [eventType] },
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
       { url: '/api/slots', status: 404, body: { status: 404, title: 'Тип события не найден' } },
     ])
 
