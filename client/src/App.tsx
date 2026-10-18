@@ -18,6 +18,9 @@ export default function App() {
             <Anchor component={Link} to="/admin/meetings" c="inherit">
               Встречи
             </Anchor>
+            <Anchor component={Link} to="/admin/settings" c="inherit">
+              Настройки
+            </Anchor>
           </Group>
         </Group>
       </AppShell.Header>

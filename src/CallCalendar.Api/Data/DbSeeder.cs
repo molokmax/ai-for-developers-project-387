@@ -1,39 +1,55 @@
 using CallCalendar.Api.Data.Entities;
+using CallCalendar.Api.Services;
 
 namespace CallCalendar.Api.Data;
 
 /// <summary>
-/// Сидирует демонстрационные типы событий. Слоты и записи не создаются: свободные слоты вычисляются на лету.
+/// Сидирует демонстрационные типы событий и настройки календаря. Слоты и записи не создаются:
+/// свободные слоты вычисляются на лету.
 /// </summary>
 public static class DbSeeder
 {
-    public static void Seed(AppDbContext db)
+    public static void Seed(AppDbContext db, int defaultBookingWindowDays)
     {
-        if (db.EventTypes.Any())
+        var changed = false;
+
+        if (!db.CalendarSettings.Any())
         {
-            return;
+            db.CalendarSettings.Add(new CalendarSettings
+            {
+                Id = CalendarSettingsStore.SettingsRowId,
+                BookingWindowDays = defaultBookingWindowDays,
+            });
+            changed = true;
         }
 
-        db.EventTypes.AddRange(
-            new EventType
-            {
-                Name = "Вводный звонок",
-                Description = "Знакомство, обсуждение целей и запроса",
-                DurationMinutes = 30,
-            },
-            new EventType
-            {
-                Name = "Обсуждение проекта",
-                Description = "Разбор требований, сроков и бюджета проекта",
-                DurationMinutes = 60,
-            },
-            new EventType
-            {
-                Name = "Ревью кода",
-                Description = "Разбор архитектуры и кода проекта с рекомендациями",
-                DurationMinutes = 90,
-            });
+        if (!db.EventTypes.Any())
+        {
+            db.EventTypes.AddRange(
+                new EventType
+                {
+                    Name = "Вводный звонок",
+                    Description = "Знакомство, обсуждение целей и запроса",
+                    DurationMinutes = 30,
+                },
+                new EventType
+                {
+                    Name = "Обсуждение проекта",
+                    Description = "Разбор требований, сроков и бюджета проекта",
+                    DurationMinutes = 60,
+                },
+                new EventType
+                {
+                    Name = "Ревью кода",
+                    Description = "Разбор архитектуры и кода проекта с рекомендациями",
+                    DurationMinutes = 90,
+                });
+            changed = true;
+        }
 
-        db.SaveChanges();
+        if (changed)
+        {
+            db.SaveChanges();
+        }
     }
 }

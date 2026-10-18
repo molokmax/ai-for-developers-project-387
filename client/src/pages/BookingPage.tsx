@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { bookingsCreate, getSlotsListQueryKey, useEventTypesList, useSlotsList } from '../api/gen'
+import { bookingsCreate, getSlotsListQueryKey, useEventTypesList, useSettingsGet, useSlotsList } from '../api/gen'
 import { problemFieldErrors, type FieldErrors } from '../api/problemErrors'
 import type { Booking, Slot } from '../api/gen/model'
 
@@ -16,9 +16,9 @@ type BookingFieldErrors = FieldErrors<'name' | 'email'>
 // Ключи ошибок валидации: имена полей контракта -> поля формы
 const CONTRACT_FIELD_MAP = { customerName: 'name', customerEmail: 'email' } as const
 
-// Окно записи: 14 календарных дней (спека). Сервер считает окно в часовом поясе
-// владельца и валидирует окончательно; границы календаря здесь только для UX
-const BOOKING_WINDOW_DAYS = 14
+// Запасное окно записи, если настройки ещё не загрузились. Сервер считает окно
+// в часовом поясе владельца и валидирует окончательно; границы календаря здесь только для UX
+const FALLBACK_BOOKING_WINDOW_DAYS = 14
 
 // Idempotency-Key: UUID на попытку записи (спека); в jsdom randomUUID может отсутствовать
 function newIdempotencyKey(): string {
@@ -42,6 +42,9 @@ export default function BookingPage() {
 
   const typesQuery = useEventTypesList()
   const eventType = typesQuery.data?.data.find(item => item.id === eventTypeId)
+
+  const settingsQuery = useSettingsGet()
+  const bookingWindowDays = settingsQuery.data?.data.bookingWindowDays ?? FALLBACK_BOOKING_WINDOW_DAYS
 
   const slotsQuery = useSlotsList({ eventTypeId })
   const slots = slotsQuery.data?.status === 200 ? slotsQuery.data.data : undefined
@@ -72,7 +75,7 @@ export default function BookingPage() {
 
   const datesWithSlots = useMemo(() => [...slotsByDate.keys()].sort(), [slotsByDate])
   const today = dayjs().format('YYYY-MM-DD')
-  const windowEnd = dayjs().add(BOOKING_WINDOW_DAYS - 1, 'day').format('YYYY-MM-DD')
+  const windowEnd = dayjs().add(bookingWindowDays - 1, 'day').format('YYYY-MM-DD')
   const activeDate = date ?? datesWithSlots[0] ?? today
   const daySlots = slotsByDate.get(activeDate) ?? []
   // Даты вне окна записи отключаем через excludeDate, а не minDate/maxDate:
@@ -157,7 +160,7 @@ export default function BookingPage() {
           {eventType?.description && <Text c="dimmed">{eventType.description}</Text>}
         </Stack>
 
-        {typesQuery.isLoading || slotsQuery.isLoading ? (
+        {typesQuery.isLoading || settingsQuery.isLoading || slotsQuery.isLoading ? (
           <Skeleton height={360} radius="sm" />
         ) : isUnknownEventType ? (
           <Text>Тип события не найден</Text>

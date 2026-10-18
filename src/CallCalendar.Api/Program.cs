@@ -15,7 +15,9 @@ builder.Services.AddMinimalOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddSingleton(CalendarOptions.FromConfiguration(builder.Configuration));
+var calendarOptions = CalendarOptions.FromConfiguration(builder.Configuration);
+builder.Services.AddSingleton(calendarOptions);
+builder.Services.AddScoped<CalendarSettingsStore>();
 
 var app = builder.Build();
 
@@ -30,7 +32,7 @@ if (app.Environment.IsDevelopment() || IsMigrationsRequested())
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
-    DbSeeder.Seed(db);
+    DbSeeder.Seed(db, calendarOptions.DefaultBookingWindowDays);
 
     // Авторский контракт отдаётся как статика: /openapi/schema.json
     app.MapOpenApiSchemas();

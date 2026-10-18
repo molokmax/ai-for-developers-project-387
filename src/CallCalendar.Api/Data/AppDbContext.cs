@@ -9,6 +9,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<Booking> Bookings => Set<Booking>();
 
+    public DbSet<CalendarSettings> CalendarSettings => Set<CalendarSettings>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // SQLite хранит DateTime без информации о Kind; всё в UTC, Kind проставляется при материализации

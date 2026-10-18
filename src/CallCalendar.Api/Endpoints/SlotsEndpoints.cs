@@ -9,7 +9,7 @@ using Dtos = CallCalendar.Api.Contracts.Contracts;
 
 namespace CallCalendar.Api.Endpoints;
 
-public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar)
+public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar, CalendarSettingsStore settings)
     : Bases.SlotsListEndpointBase
 {
     public override async Task<Results<Ok<Dtos.Slot[]>, NotFound<Dtos.ProblemDetails>>> HandleAsync(
@@ -26,11 +26,12 @@ public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar)
 
         var nowUtc = DateTime.UtcNow;
         var duration = TimeSpan.FromMinutes(eventType.DurationMinutes);
+        var bookingWindowDays = await settings.GetBookingWindowDaysAsync(cancellationToken);
 
         // Занятость в пределах окна записи: пересечения с записями любых типов событий
         var todayLocal = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(nowUtc, calendar.TimeZone).Date);
         var windowStart = ToUtc(todayLocal.ToDateTime(SlotGrid.WorkStart), calendar.TimeZone);
-        var windowEnd = ToUtc(todayLocal.AddDays(SlotGrid.BookingWindowDays).ToDateTime(SlotGrid.WorkEnd), calendar.TimeZone);
+        var windowEnd = ToUtc(todayLocal.AddDays(bookingWindowDays).ToDateTime(SlotGrid.WorkEnd), calendar.TimeZone);
 
         var busy = await db.Bookings
             .AsNoTracking()
@@ -39,7 +40,7 @@ public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar)
             .ToArrayAsync(cancellationToken);
 
         var slots = SlotGrid
-            .FreeSlots(calendar.TimeZone, duration, nowUtc, busy)
+            .FreeSlots(calendar.TimeZone, duration, nowUtc, bookingWindowDays, busy)
             .Select(slot => new Dtos.Slot
             {
                 StartUtc = new DateTimeOffset(slot.Item1, TimeSpan.Zero),
