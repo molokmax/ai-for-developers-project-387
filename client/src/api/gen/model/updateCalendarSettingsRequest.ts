@@ -18,4 +18,14 @@ export interface UpdateCalendarSettingsRequest {
      * @minimum 1
      */
   bookingWindowDays: number;
+  /**
+     * Начало обеденного перерыва по времени владельца или null, если перерыв не задан
+     * @nullable
+     */
+  lunchBreakStart: string | null;
+  /**
+     * Конец обеденного перерыва по времени владельца или null, если перерыв не задан
+     * @nullable
+     */
+  lunchBreakEnd: string | null;
 }

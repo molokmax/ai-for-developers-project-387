@@ -52,8 +52,9 @@ public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions cale
         var duration = TimeSpan.FromMinutes(eventType.DurationMinutes);
         var startUtc = request.StartUtc.ToUniversalTime().UtcDateTime;
         var bookingWindowDays = await settings.GetBookingWindowDaysAsync(cancellationToken);
+        var lunchBreak = await settings.GetLunchBreakAsync(cancellationToken);
 
-        if (!SlotGrid.IsStartAvailable(calendar.TimeZone, startUtc, duration, nowUtc, bookingWindowDays, out var error))
+        if (!SlotGrid.IsStartAvailable(calendar.TimeZone, startUtc, duration, nowUtc, bookingWindowDays, lunchBreak, out var error))
         {
             return TypedResults.BadRequest(ApiProblems.InvalidRequest(error));
         }

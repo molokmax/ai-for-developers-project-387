@@ -27,6 +27,7 @@ public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar,
         var nowUtc = DateTime.UtcNow;
         var duration = TimeSpan.FromMinutes(eventType.DurationMinutes);
         var bookingWindowDays = await settings.GetBookingWindowDaysAsync(cancellationToken);
+        var lunchBreak = await settings.GetLunchBreakAsync(cancellationToken);
 
         // Занятость в пределах окна записи: пересечения с записями любых типов событий
         var todayLocal = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(nowUtc, calendar.TimeZone).Date);
@@ -40,7 +41,7 @@ public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar,
             .ToArrayAsync(cancellationToken);
 
         var slots = SlotGrid
-            .FreeSlots(calendar.TimeZone, duration, nowUtc, bookingWindowDays, busy)
+            .FreeSlots(calendar.TimeZone, duration, nowUtc, bookingWindowDays, busy, lunchBreak)
             .Select(slot => new Dtos.Slot
             {
                 StartUtc = new DateTimeOffset(slot.Item1, TimeSpan.Zero),

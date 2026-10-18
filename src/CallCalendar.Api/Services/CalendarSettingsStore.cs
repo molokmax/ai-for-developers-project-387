@@ -36,4 +36,17 @@ public sealed class CalendarSettingsStore(AppDbContext db, CalendarOptions optio
 
     public async Task<int> GetBookingWindowDaysAsync(CancellationToken cancellationToken) =>
         (await GetAsync(cancellationToken)).BookingWindowDays;
+
+    /// <summary>Обеденный перерыв по времени владельца или null, если он не задан.</summary>
+    public async Task<(TimeOnly Start, TimeOnly End)?> GetLunchBreakAsync(CancellationToken cancellationToken)
+    {
+        var settings = await GetAsync(cancellationToken);
+
+        if (settings.LunchBreakStart is not { } start || settings.LunchBreakEnd is not { } end)
+        {
+            return null;
+        }
+
+        return (start, end);
+    }
 }
