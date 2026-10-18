@@ -18,7 +18,7 @@ public static class DbSeeder
             db.CalendarSettings.Add(new CalendarSettings
             {
                 Id = CalendarSettingsStore.SettingsRowId,
-                BookingWindowDays = defaultBookingWindowDays,
+                BookingWindowDays = defaultBookingWindowDays
             });
             changed = true;
         }
@@ -30,19 +30,19 @@ public static class DbSeeder
                 {
                     Name = "Вводный звонок",
                     Description = "Знакомство, обсуждение целей и запроса",
-                    DurationMinutes = 30,
+                    DurationMinutes = 30
                 },
                 new EventType
                 {
                     Name = "Обсуждение проекта",
                     Description = "Разбор требований, сроков и бюджета проекта",
-                    DurationMinutes = 60,
+                    DurationMinutes = 60
                 },
                 new EventType
                 {
                     Name = "Ревью кода",
                     Description = "Разбор архитектуры и кода проекта с рекомендациями",
-                    DurationMinutes = 90,
+                    DurationMinutes = 90
                 });
             changed = true;
         }

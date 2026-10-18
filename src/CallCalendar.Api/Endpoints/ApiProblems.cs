@@ -11,20 +11,20 @@ internal static class ApiProblems
     {
         Status = StatusCodes.Status400BadRequest,
         Title = "Некорректный запрос",
-        Detail = detail,
+        Detail = detail
     };
 
     public static Dtos.ProblemDetails EventTypeNotFound(long eventTypeId) => new()
     {
         Status = StatusCodes.Status404NotFound,
         Title = "Тип события не найден",
-        Detail = $"Тип события {eventTypeId} не найден",
+        Detail = $"Тип события {eventTypeId} не найден"
     };
 
     public static Dtos.ProblemDetails SlotConflict() => new()
     {
         Status = StatusCodes.Status409Conflict,
         Title = "Конфликт занятости",
-        Detail = "Интервал записи пересекается с существующей записью",
+        Detail = "Интервал записи пересекается с существующей записью"
     };
 }

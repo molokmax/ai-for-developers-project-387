@@ -25,7 +25,7 @@ public sealed class CalendarSettingsStore(AppDbContext db, CalendarOptions optio
         settings = new Data.Entities.CalendarSettings
         {
             Id = SettingsRowId,
-            BookingWindowDays = options.DefaultBookingWindowDays,
+            BookingWindowDays = options.DefaultBookingWindowDays
         };
 
         db.CalendarSettings.Add(settings);

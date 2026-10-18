@@ -23,7 +23,7 @@ public sealed class SettingsGetEndpoint(CalendarSettingsStore settings)
     {
         BookingWindowDays = settings.BookingWindowDays,
         LunchBreakStart = FormatTime(settings.LunchBreakStart),
-        LunchBreakEnd = FormatTime(settings.LunchBreakEnd),
+        LunchBreakEnd = FormatTime(settings.LunchBreakEnd)
     };
 
     private static string? FormatTime(TimeOnly? value) =>

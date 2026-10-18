@@ -45,7 +45,7 @@ public sealed class SlotsListEndpoint(AppDbContext db, CalendarOptions calendar,
             .Select(slot => new Dtos.Slot
             {
                 StartUtc = new DateTimeOffset(slot.Item1, TimeSpan.Zero),
-                EndUtc = new DateTimeOffset(slot.Item2, TimeSpan.Zero),
+                EndUtc = new DateTimeOffset(slot.Item2, TimeSpan.Zero)
             })
             .ToArray();
 

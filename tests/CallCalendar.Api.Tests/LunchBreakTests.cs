@@ -46,7 +46,7 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         {
             bookingWindowDays = 14,
             lunchBreakStart = (string?)null,
-            lunchBreakEnd = (string?)null,
+            lunchBreakEnd = (string?)null
         });
         Assert.Equal(HttpStatusCode.OK, cleared.StatusCode);
         var clearedBody = JsonDocument.Parse(await cleared.Content.ReadAsStringAsync()).RootElement;
@@ -149,7 +149,7 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         {
             bookingWindowDays = 14,
             lunchBreakStart = start,
-            lunchBreakEnd = end,
+            lunchBreakEnd = end
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -162,7 +162,7 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         {
             bookingWindowDays = 14,
             lunchBreakStart = start.ToString("HH:mm", CultureInfo.InvariantCulture),
-            lunchBreakEnd = end.ToString("HH:mm", CultureInfo.InvariantCulture),
+            lunchBreakEnd = end.ToString("HH:mm", CultureInfo.InvariantCulture)
         });
 
     private static Task<HttpResponseMessage> ClearLunchAsync(HttpClient client) =>
@@ -170,7 +170,7 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         {
             bookingWindowDays = 14,
             lunchBreakStart = (string?)null,
-            lunchBreakEnd = (string?)null,
+            lunchBreakEnd = (string?)null
         });
 
     private static async Task<(long EventTypeId, int DurationMinutes)> GetFirstEventTypeAsync(HttpClient client)
@@ -211,7 +211,7 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
             eventTypeId,
             startUtc,
             customerName = "Мария Иванова",
-            customerEmail = "maria@example.com",
+            customerEmail = "maria@example.com"
         });
 
         return await client.SendAsync(request);

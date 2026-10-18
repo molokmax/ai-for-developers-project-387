@@ -23,7 +23,7 @@ public sealed class EventTypesListEndpoint(AppDbContext db)
                 Id = eventType.Id,
                 Name = eventType.Name,
                 Description = eventType.Description,
-                DurationMinutes = eventType.DurationMinutes,
+                DurationMinutes = eventType.DurationMinutes
             })
             .ToArrayAsync(cancellationToken);
 
@@ -48,7 +48,7 @@ public sealed class EventTypesCreateEndpoint(AppDbContext db)
         {
             Name = request.Name,
             Description = request.Description,
-            DurationMinutes = request.DurationMinutes,
+            DurationMinutes = request.DurationMinutes
         };
 
         db.EventTypes.Add(eventType);
@@ -62,6 +62,6 @@ public sealed class EventTypesCreateEndpoint(AppDbContext db)
         Id = eventType.Id,
         Name = eventType.Name,
         Description = eventType.Description,
-        DurationMinutes = eventType.DurationMinutes,
+        DurationMinutes = eventType.DurationMinutes
     };
 }
