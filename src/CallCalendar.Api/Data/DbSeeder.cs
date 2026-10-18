@@ -9,7 +9,7 @@ namespace CallCalendar.Api.Data;
 /// </summary>
 public static class DbSeeder
 {
-    public static void Seed(AppDbContext db, int defaultBookingWindowDays)
+    public static void Seed(AppDbContext db, CalendarOptions options)
     {
         var changed = false;
 
@@ -18,7 +18,9 @@ public static class DbSeeder
             db.CalendarSettings.Add(new CalendarSettings
             {
                 Id = CalendarSettingsStore.SettingsRowId,
-                BookingWindowDays = defaultBookingWindowDays
+                BookingWindowDays = options.DefaultBookingWindowDays,
+                WorkStart = options.DefaultWorkStart,
+                WorkEnd = options.DefaultWorkEnd
             });
             changed = true;
         }

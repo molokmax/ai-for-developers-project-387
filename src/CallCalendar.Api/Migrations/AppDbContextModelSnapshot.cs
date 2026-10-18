@@ -77,6 +77,16 @@ namespace CallCalendar.Api.Migrations
                     b.Property<TimeOnly?>("LunchBreakStart")
                         .HasColumnType("TEXT");
 
+                    b.Property<TimeOnly>("WorkEnd")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new TimeOnly(18, 0, 0));
+
+                    b.Property<TimeOnly>("WorkStart")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new TimeOnly(9, 0, 0));
+
                     b.HasKey("Id");
 
                     b.ToTable("CalendarSettings");

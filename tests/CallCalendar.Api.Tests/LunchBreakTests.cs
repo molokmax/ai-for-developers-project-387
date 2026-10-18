@@ -18,6 +18,9 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
     private static readonly TimeOnly LunchStart = new(13, 0);
     private static readonly TimeOnly LunchEnd = new(14, 0);
 
+    private static readonly TimeOnly WorkStart = new(9, 0);
+    private static readonly TimeOnly WorkEnd = new(18, 0);
+
     [Fact]
     public async Task Settings_DefaultLunchBreakIsNull()
     {
@@ -45,6 +48,8 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         var cleared = await client.PutAsJsonAsync("/api/settings", new
         {
             bookingWindowDays = 14,
+            workStart = "09:00",
+            workEnd = "18:00",
             lunchBreakStart = (string?)null,
             lunchBreakEnd = (string?)null
         });
@@ -148,6 +153,8 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         var response = await client.PutAsJsonAsync("/api/settings", new
         {
             bookingWindowDays = 14,
+            workStart = "09:00",
+            workEnd = "18:00",
             lunchBreakStart = start,
             lunchBreakEnd = end
         });
@@ -161,6 +168,8 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         client.PutAsJsonAsync("/api/settings", new
         {
             bookingWindowDays = 14,
+            workStart = WorkStart.ToString("HH:mm", CultureInfo.InvariantCulture),
+            workEnd = WorkEnd.ToString("HH:mm", CultureInfo.InvariantCulture),
             lunchBreakStart = start.ToString("HH:mm", CultureInfo.InvariantCulture),
             lunchBreakEnd = end.ToString("HH:mm", CultureInfo.InvariantCulture)
         });
@@ -169,6 +178,8 @@ public class LunchBreakTests(WebAppFactory factory) : IClassFixture<WebAppFactor
         client.PutAsJsonAsync("/api/settings", new
         {
             bookingWindowDays = 14,
+            workStart = WorkStart.ToString("HH:mm", CultureInfo.InvariantCulture),
+            workEnd = WorkEnd.ToString("HH:mm", CultureInfo.InvariantCulture),
             lunchBreakStart = (string?)null,
             lunchBreakEnd = (string?)null
         });
