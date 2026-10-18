@@ -25,12 +25,12 @@ public sealed class MeetingsListEndpoint(AppDbContext db)
                 EventType = new Dtos.MeetingEventType
                 {
                     Id = booking.EventType!.Id,
-                    Name = booking.EventType.Name,
+                    Name = booking.EventType.Name
                 },
                 StartUtc = new DateTimeOffset(booking.StartUtc, TimeSpan.Zero),
                 EndUtc = new DateTimeOffset(booking.EndUtc, TimeSpan.Zero),
                 CustomerName = booking.CustomerName,
-                CustomerEmail = booking.CustomerEmail,
+                CustomerEmail = booking.CustomerEmail
             })
             .ToArrayAsync(cancellationToken);
 

@@ -71,6 +71,12 @@ namespace CallCalendar.Api.Migrations
                     b.Property<int>("BookingWindowDays")
                         .HasColumnType("INTEGER");
 
+                    b.Property<TimeOnly?>("LunchBreakEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeOnly?>("LunchBreakStart")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("CalendarSettings");

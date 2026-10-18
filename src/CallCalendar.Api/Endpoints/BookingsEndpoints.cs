@@ -52,8 +52,9 @@ public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions cale
         var duration = TimeSpan.FromMinutes(eventType.DurationMinutes);
         var startUtc = request.StartUtc.ToUniversalTime().UtcDateTime;
         var bookingWindowDays = await settings.GetBookingWindowDaysAsync(cancellationToken);
+        var lunchBreak = await settings.GetLunchBreakAsync(cancellationToken);
 
-        if (!SlotGrid.IsStartAvailable(calendar.TimeZone, startUtc, duration, nowUtc, bookingWindowDays, out var error))
+        if (!SlotGrid.IsStartAvailable(calendar.TimeZone, startUtc, duration, nowUtc, bookingWindowDays, lunchBreak, out var error))
         {
             return TypedResults.BadRequest(ApiProblems.InvalidRequest(error));
         }
@@ -76,7 +77,7 @@ public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions cale
             EndUtc = endUtc,
             CustomerName = request.CustomerName,
             CustomerEmail = request.CustomerEmail,
-            IdempotencyKey = parameters.IdempotencyKey,
+            IdempotencyKey = parameters.IdempotencyKey
         };
 
         db.Bookings.Add(booking);
@@ -93,11 +94,11 @@ public sealed class BookingsCreateEndpoint(AppDbContext db, CalendarOptions cale
         EventType = new Dtos.BookingEventType
         {
             Id = booking.EventTypeId,
-            Name = booking.EventType?.Name ?? string.Empty,
+            Name = booking.EventType?.Name ?? string.Empty
         },
         StartUtc = new DateTimeOffset(booking.StartUtc, TimeSpan.Zero),
         EndUtc = new DateTimeOffset(booking.EndUtc, TimeSpan.Zero),
         CustomerName = booking.CustomerName,
-        CustomerEmail = booking.CustomerEmail,
+        CustomerEmail = booking.CustomerEmail
     };
 }

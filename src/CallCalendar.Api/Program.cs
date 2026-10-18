@@ -78,7 +78,7 @@ static StaticFileOptions CreateStaticFileOptions() => new()
         {
             headers.CacheControl = "no-cache";
         }
-    },
+    }
 };
 
 /// <summary>

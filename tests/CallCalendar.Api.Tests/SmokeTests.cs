@@ -55,7 +55,7 @@ public class SmokeTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
         {
             name = "Обсуждение",
             description = "Описание",
-            durationMinutes = 25,
+            durationMinutes = 25
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, belowRange.StatusCode);
@@ -68,7 +68,7 @@ public class SmokeTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
         {
             name = "Обсуждение",
             description = "Описание",
-            durationMinutes = 50,
+            durationMinutes = 50
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, notMultiple.StatusCode);
@@ -88,7 +88,7 @@ public class SmokeTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
         {
             name = "Быстрый созвон",
             description = "Короткое обсуждение",
-            durationMinutes = 30,
+            durationMinutes = 30
         });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -144,7 +144,7 @@ public class SmokeTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
             eventTypeId,
             startUtc = slotStart,
             customerName = "Мария Иванова",
-            customerEmail = "maria@example.com",
+            customerEmail = "maria@example.com"
         });
 
         var response = await client.SendAsync(request);
@@ -441,7 +441,7 @@ public class SmokeTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
             eventTypeId,
             startUtc,
             customerName,
-            customerEmail,
+            customerEmail
         });
 
         var response = await client.SendAsync(request);

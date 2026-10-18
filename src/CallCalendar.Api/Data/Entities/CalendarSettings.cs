@@ -11,4 +11,10 @@ public class CalendarSettings
 
     /// <summary>Окно записи в календарных днях, включая текущий.</summary>
     public int BookingWindowDays { get; set; }
+
+    /// <summary>Начало обеденного перерыва по времени владельца; null - перерыв не задан.</summary>
+    public TimeOnly? LunchBreakStart { get; set; }
+
+    /// <summary>Конец обеденного перерыва по времени владельца; null - перерыв не задан.</summary>
+    public TimeOnly? LunchBreakEnd { get; set; }
 }
