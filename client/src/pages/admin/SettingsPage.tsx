@@ -13,7 +13,7 @@ type SettingsFieldErrors = FieldErrors<'bookingWindowDays' | 'lunchBreakStart' |
 const CONTRACT_FIELD_MAP = {
   bookingWindowDays: 'bookingWindowDays',
   lunchBreakStart: 'lunchBreakStart',
-  lunchBreakEnd: 'lunchBreakEnd',
+  lunchBreakEnd: 'lunchBreakEnd'
 } as const
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/
@@ -48,7 +48,7 @@ export default function SettingsPage() {
           message: response.data.lunchBreakStart
             ? `Окно записи: ${response.data.bookingWindowDays} дней, обед: ${response.data.lunchBreakStart.slice(0, 5)}–${response.data.lunchBreakEnd?.slice(0, 5) ?? ''}`
             : `Окно записи: ${response.data.bookingWindowDays} дней`,
-          color: 'green',
+          color: 'green'
         })
         setFieldErrors({})
         await queryClient.invalidateQueries({ queryKey: getSettingsGetQueryKey() })
@@ -61,10 +61,10 @@ export default function SettingsPage() {
         notifications.show({
           title: response.data.title ?? 'Некорректный запрос',
           message: response.data.detail ?? 'Проверьте значение окна записи',
-          color: 'red',
+          color: 'red'
         })
       }
-    },
+    }
   })
 
   const submit = () => {
@@ -101,7 +101,7 @@ export default function SettingsPage() {
     updateMutation.mutate({
       bookingWindowDays: windowDays,
       lunchBreakStart: hasLunchStart ? toContractValue(lunchStart) : null,
-      lunchBreakEnd: hasLunchEnd ? toContractValue(lunchEnd) : null,
+      lunchBreakEnd: hasLunchEnd ? toContractValue(lunchEnd) : null
     })
   }
 

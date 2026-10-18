@@ -9,8 +9,8 @@ describe('SettingsPage (настройки календаря)', () => {
       {
         url: '/api/settings',
         status: 200,
-        body: { bookingWindowDays: 14, lunchBreakStart: '13:00:00', lunchBreakEnd: '14:00:00' },
-      },
+        body: { bookingWindowDays: 14, lunchBreakStart: '13:00:00', lunchBreakEnd: '14:00:00' }
+      }
     ])
 
     renderPage(<SettingsPage />, { route: '/admin/settings', path: '/admin/settings' })
@@ -25,7 +25,7 @@ describe('SettingsPage (настройки календаря)', () => {
   it('сохраняет новое значение окна записи без перерыва', async () => {
     const fetchMock = mockFetch([
       { url: '/api/settings', status: 200, body: { bookingWindowDays: 14 } },
-      { url: '/api/settings', method: 'PUT', status: 200, body: { bookingWindowDays: 30 } },
+      { url: '/api/settings', method: 'PUT', status: 200, body: { bookingWindowDays: 30 } }
     ])
 
     renderPage(<SettingsPage />, { route: '/admin/settings', path: '/admin/settings' })
@@ -36,13 +36,13 @@ describe('SettingsPage (настройки календаря)', () => {
 
     await waitFor(() => {
       const updateCall = fetchMock.mock.calls.find(
-        ([url, init]) => String(url) === '/api/settings' && init?.method === 'PUT',
+        ([url, init]) => String(url) === '/api/settings' && init?.method === 'PUT'
       )
       expect(updateCall).toBeDefined()
       expect(JSON.parse(String(updateCall![1]!.body))).toEqual({
         bookingWindowDays: 30,
         lunchBreakStart: null,
-        lunchBreakEnd: null,
+        lunchBreakEnd: null
       })
     })
 
@@ -56,8 +56,8 @@ describe('SettingsPage (настройки календаря)', () => {
         url: '/api/settings',
         method: 'PUT',
         status: 200,
-        body: { bookingWindowDays: 14, lunchBreakStart: '13:00:00', lunchBreakEnd: '14:00:00' },
-      },
+        body: { bookingWindowDays: 14, lunchBreakStart: '13:00:00', lunchBreakEnd: '14:00:00' }
+      }
     ])
 
     renderPage(<SettingsPage />, { route: '/admin/settings', path: '/admin/settings' })
@@ -68,13 +68,13 @@ describe('SettingsPage (настройки календаря)', () => {
 
     await waitFor(() => {
       const updateCall = fetchMock.mock.calls.find(
-        ([url, init]) => String(url) === '/api/settings' && init?.method === 'PUT',
+        ([url, init]) => String(url) === '/api/settings' && init?.method === 'PUT'
       )
       expect(updateCall).toBeDefined()
       expect(JSON.parse(String(updateCall![1]!.body))).toEqual({
         bookingWindowDays: 14,
         lunchBreakStart: '13:00:00',
-        lunchBreakEnd: '14:00:00',
+        lunchBreakEnd: '14:00:00'
       })
     })
   })
