@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/molokmax/ai-for-developers-project-387/compare/v1.0.0...v1.1.0) (2026-10-18)
+
+
+### Features
+
+* **settings:** add configurable lunch break ([040cf11](https://github.com/molokmax/ai-for-developers-project-387/commit/040cf11fa1290c4a6e508f4675109f8ce5b072c9))
+
+
+### Bug Fixes
+
+* review workflow ([9bbb5fc](https://github.com/molokmax/ai-for-developers-project-387/commit/9bbb5fc48e0b3dd5656d9e991af1d2cb249b1a25))
+* review workflow ([925cad7](https://github.com/molokmax/ai-for-developers-project-387/commit/925cad78ebca91a3af9fab98e6681813a8978c6b))
+
 ## 1.0.0 (2026-10-17)
 
 
