@@ -22,9 +22,14 @@ public sealed class SettingsGetEndpoint(CalendarSettingsStore settings)
     internal static Dtos.CalendarSettings ToDto(Data.Entities.CalendarSettings settings) => new()
     {
         BookingWindowDays = settings.BookingWindowDays,
+        WorkStart = FormatTime(settings.WorkStart),
+        WorkEnd = FormatTime(settings.WorkEnd),
         LunchBreakStart = FormatTime(settings.LunchBreakStart),
         LunchBreakEnd = FormatTime(settings.LunchBreakEnd)
     };
+
+    private static string FormatTime(TimeOnly value) =>
+        value.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
     private static string? FormatTime(TimeOnly? value) =>
         value?.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
@@ -36,18 +41,54 @@ public sealed class SettingsUpdateEndpoint(AppDbContext db, CalendarSettingsStor
     public override async Task<Results<Ok<Dtos.CalendarSettings>, BadRequest<Dtos.ProblemDetails>>> HandleAsync(
         Dtos.UpdateCalendarSettingsRequest request, CancellationToken cancellationToken)
     {
-        if (!TryResolveLunchBreak(request.LunchBreakStart, request.LunchBreakEnd, out var lunchStart, out var lunchEnd, out var error))
+        if (!TryResolveWorkHours(request.WorkStart, request.WorkEnd, out var workStart, out var workEnd, out var error))
+        {
+            return TypedResults.BadRequest(ApiProblems.InvalidRequest(error));
+        }
+
+        if (!TryResolveLunchBreak(request.LunchBreakStart, request.LunchBreakEnd, workStart, workEnd, out var lunchStart, out var lunchEnd, out error))
         {
             return TypedResults.BadRequest(ApiProblems.InvalidRequest(error));
         }
 
         var current = await settings.GetAsync(cancellationToken);
         current.BookingWindowDays = request.BookingWindowDays;
+        current.WorkStart = workStart;
+        current.WorkEnd = workEnd;
         current.LunchBreakStart = lunchStart;
         current.LunchBreakEnd = lunchEnd;
         await db.SaveChangesAsync(cancellationToken);
 
         return TypedResults.Ok(SettingsGetEndpoint.ToDto(current));
+    }
+
+    /// <summary>
+    /// Рабочий день задаётся обеими границами; начало строго раньше конца.
+    /// </summary>
+    private static bool TryResolveWorkHours(
+        string? rawStart,
+        string? rawEnd,
+        out TimeOnly start,
+        out TimeOnly end,
+        out string error)
+    {
+        start = default;
+        end = default;
+
+        if (!TryParseTime(rawStart, out start) || !TryParseTime(rawEnd, out end))
+        {
+            error = "Границы рабочего дня должны быть временем в формате HH:mm по времени владельца";
+            return false;
+        }
+
+        if (start >= end)
+        {
+            error = "Начало рабочего дня должно быть раньше его конца";
+            return false;
+        }
+
+        error = string.Empty;
+        return true;
     }
 
     /// <summary>
@@ -57,6 +98,8 @@ public sealed class SettingsUpdateEndpoint(AppDbContext db, CalendarSettingsStor
     private static bool TryResolveLunchBreak(
         string? rawStart,
         string? rawEnd,
+        TimeOnly workStart,
+        TimeOnly workEnd,
         out TimeOnly? start,
         out TimeOnly? end,
         out string error)
@@ -91,9 +134,9 @@ public sealed class SettingsUpdateEndpoint(AppDbContext db, CalendarSettingsStor
             return false;
         }
 
-        if (parsedStart < SlotGrid.WorkStart || parsedEnd > SlotGrid.WorkEnd)
+        if (parsedStart < workStart || parsedEnd > workEnd)
         {
-            error = $"Обеденный перерыв должен целиком помещаться в рабочий день {SlotGrid.WorkStart:hh\\:mm}-{SlotGrid.WorkEnd:hh\\:mm} по времени владельца";
+            error = $"Обеденный перерыв должен целиком помещаться в рабочий день {workStart:hh\\:mm}-{workEnd:hh\\:mm} по времени владельца";
             return false;
         }
 

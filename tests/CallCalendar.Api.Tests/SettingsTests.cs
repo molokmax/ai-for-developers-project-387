@@ -25,12 +25,12 @@ public class SettingsTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
         Assert.Equal(14, initial.GetProperty("bookingWindowDays").GetInt32());
 
         // Некорректное значение отклоняется валидацией контракта
-        var invalid = await client.PutAsJsonAsync("/api/settings", new { bookingWindowDays = 0 });
+        var invalid = await client.PutAsJsonAsync("/api/settings", SettingsRequest(0));
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
         Assert.Equal("application/problem+json", invalid.Content.Headers.ContentType?.MediaType);
 
         // Владелец уменьшает окно записи
-        var updated = await client.PutAsJsonAsync("/api/settings", new { bookingWindowDays = 2 });
+        var updated = await client.PutAsJsonAsync("/api/settings", SettingsRequest(2));
         Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
         var updatedBody = JsonDocument.Parse(await updated.Content.ReadAsStringAsync()).RootElement;
         Assert.Equal(2, updatedBody.GetProperty("bookingWindowDays").GetInt32());
@@ -53,7 +53,16 @@ public class SettingsTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
         }
 
         // Возврат к значению по умолчанию, чтобы не влиять на прочие проверки
-        var restored = await client.PutAsJsonAsync("/api/settings", new { bookingWindowDays = 14 });
+        var restored = await client.PutAsJsonAsync("/api/settings", SettingsRequest(14));
         Assert.Equal(HttpStatusCode.OK, restored.StatusCode);
     }
+
+    private static object SettingsRequest(int bookingWindowDays) => new
+    {
+        bookingWindowDays,
+        workStart = "09:00",
+        workEnd = "18:00",
+        lunchBreakStart = (string?)null,
+        lunchBreakEnd = (string?)null
+    };
 }

@@ -32,7 +32,7 @@ if (app.Environment.IsDevelopment() || IsMigrationsRequested())
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
-    DbSeeder.Seed(db, calendarOptions.DefaultBookingWindowDays);
+    DbSeeder.Seed(db, calendarOptions);
 
     // Авторский контракт отдаётся как статика: /openapi/schema.json
     app.MapOpenApiSchemas();
