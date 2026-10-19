@@ -32,6 +32,16 @@ npm run api:gen:watch # watch-режим генерации SDK
 
 Порядок в CI (`.github/workflows/ci.yml`): backend build(warnaserror) -> format -> test; frontend lint -> build -> test.
 
+## Коммиты
+
+Каждый коммит - по спецификации Conventional Commits, без исключений: заголовок вида `тип(скоуп): описание` на английском.
+
+- Типы: `feat`, `fix`, `docs`, `test`, `chore`, `refactor`, `ci`, `build`, `perf`, `style`, `revert`.
+- Описание в императиве, без точки в конце; ломающее изменение помечается `!` после типа/скоупа и блоком `BREAKING CHANGE:` в теле.
+- Примеры: `fix(api): reject bookings outside the booking window`, `test(slots): cover lunch break overlap`, `ci: skip PR review for bot actors`.
+
+Перед коммитом сверь заголовок с форматом, а перед завершением задачи прогони `git log --oneline -5` и проверь каждый свой коммит. release-please строит версии и changelog из этих заголовков (`.github/workflows/release-please.yml`), поэтому заголовок вне формата ломает релиз.
+
 ## Запуск dev
 
 - Терминал 1: `dotnet run --launch-profile http` из `src/CallCalendar.Api` -> http://localhost:5262
@@ -79,8 +89,7 @@ npm run api:gen:watch # watch-режим генерации SDK
 
 ## Прочее
 
-- Релизы ведёт release-please: пуш/мерж в `main` запускает `.github/workflows/release-please.yml`, который создаёт или обновляет release PR (`chore: release ...`). Релиз и тег создаются мержем release PR - версии руками не проставлять, теги руками не пушить. Отсюда обязательность Conventional Commits
-- Сообщения коммитов - по спецификации Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:` и т.п.), текст на английском
+- Релизы ведёт release-please: пуш/мерж в `main` запускает `.github/workflows/release-please.yml`, который создаёт или обновляет release PR (`chore: release ...`). Релиз и тег создаются мержем release PR - версии руками не проставлять, теги руками не пушить. Формат коммитов - в разделе «Коммиты»
 - `.github/workflows/hexlet-check.yml` - служебный, не удалять/не редактировать/не переименовывать. Свои CI-шаги добавлять отдельным workflow
 - UI-текст и комментарии в проекте на русском; на английском - только идентификаторы
 
