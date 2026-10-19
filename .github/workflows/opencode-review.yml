@@ -6,7 +6,12 @@ jobs:
   opencode-review:
     # Включаем проверку так, чтобы бот реагировал на код человека.
     # PR от bot-аккаунтов пропускаем.
-    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    # Второе условие нужно из-за внутренней проверки экшена: перед комментированием
+    # он дергает getCollaboratorPermissionLevel для github.actor и требует admin/write.
+    # Если последний push в ветку PR сделал opencode-agent[bot], actor = opencode-agent[bot],
+    # у бота API возвращает "none", и ран падает с
+    # "User opencode-agent[bot] does not have write permissions".
+    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') && !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write # Нужен для аутентификации через GitHub Actions

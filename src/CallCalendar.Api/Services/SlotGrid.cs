@@ -1,8 +1,8 @@
 namespace CallCalendar.Api.Services;
 
 /// <summary>
-/// Сетка слотов: каждые 30 минут в интервале 09:00-18:00 каждого дня по времени владельца,
-/// окно записи настраивается владельцем (число календарных дней, включая текущий).
+/// Сетка слотов: каждые 30 минут в пределах рабочего дня владельца (настраиваемые начало и конец)
+/// каждого дня по времени владельца, окно записи настраивается владельцем (число календарных дней, включая текущий).
 /// Слот свободен, если его интервал не пересекается ни с одной существующей записью
 /// и с обеденным перерывом владельца (если он задан).
 /// Все времена в UTC (DateTime.Kind = Utc).
@@ -11,24 +11,29 @@ public static class SlotGrid
 {
     public const int GridStepMinutes = 30;
 
-    public static readonly TimeOnly WorkStart = new(9, 0);
-
-    public static readonly TimeOnly WorkEnd = new(18, 0);
-
     /// <summary>Длительность допустима, если кратна 30 и минимум 30 минут.</summary>
     public static bool IsDurationValid(int minutes) => minutes >= GridStepMinutes && minutes % GridStepMinutes == 0;
 
     /// <summary>
+    /// Время выровнено на сетку слотов: минуты кратны шагу, секунды и миллисекунды равны нулю.
+    /// Границы рабочего дня должны быть выровнены, иначе выданные слоты нельзя забронировать.
+    /// </summary>
+    public static bool IsAlignedToGrid(TimeOnly time) =>
+        time.Minute % GridStepMinutes == 0 && time.Second == 0 && time.Millisecond == 0;
+
+    /// <summary>
     /// Свободные слоты для длительности <paramref name="duration"/> в окне записи
     /// <paramref name="bookingWindowDays"/> календарных дней, включая текущий:
-    /// старта на сетке, интервал целиком в рабочем дне, не в прошлом, без пересечений с <paramref name="busy"/>
-    /// и с обеденным перерывом <paramref name="lunchBreak"/> (границы по времени владельца, null - перерыв не задан).
+    /// старта на сетке, интервал целиком в рабочем дне <paramref name="workHours"/>, не в прошлом,
+    /// без пересечений с <paramref name="busy"/> и с обеденным перерывом <paramref name="lunchBreak"/>
+    /// (границы по времени владельца, null - перерыв не задан).
     /// </summary>
     public static IEnumerable<(DateTime StartUtc, DateTime EndUtc)> FreeSlots(
         TimeZoneInfo timeZone,
         TimeSpan duration,
         DateTime nowUtc,
         int bookingWindowDays,
+        (TimeOnly Start, TimeOnly End) workHours,
         IReadOnlyList<(DateTime StartUtc, DateTime EndUtc)> busy,
         (TimeOnly Start, TimeOnly End)? lunchBreak)
     {
@@ -37,8 +42,8 @@ public static class SlotGrid
         for (var day = 0; day < bookingWindowDays; day++)
         {
             var date = todayLocal.AddDays(day);
-            var workStartUtc = ToUtc(date.ToDateTime(WorkStart), timeZone);
-            var workEndUtc = ToUtc(date.ToDateTime(WorkEnd), timeZone);
+            var workStartUtc = ToUtc(date.ToDateTime(workHours.Start), timeZone);
+            var workEndUtc = ToUtc(date.ToDateTime(workHours.End), timeZone);
             var lunch = ResolveLunchBreak(date, timeZone, lunchBreak);
 
             for (var start = workStartUtc; start + duration <= workEndUtc; start += TimeSpan.FromMinutes(GridStepMinutes))
@@ -66,8 +71,9 @@ public static class SlotGrid
 
     /// <summary>
     /// Проверка, что запрошенное начало записи лежит на сетке слотов: кратность 30 минутам,
-    /// интервал целиком в рабочем дне (09:00-18:00), внутри окна записи <paramref name="bookingWindowDays"/> дней,
-    /// не пересекается с обеденным перерывом <paramref name="lunchBreak"/> и время не прошло.
+    /// интервал целиком в рабочем дне <paramref name="workHours"/>, внутри окна записи
+    /// <paramref name="bookingWindowDays"/> дней, не пересекается с обеденным перерывом
+    /// <paramref name="lunchBreak"/> и время не прошло.
     /// </summary>
     public static bool IsStartAvailable(
         TimeZoneInfo timeZone,
@@ -75,6 +81,7 @@ public static class SlotGrid
         TimeSpan duration,
         DateTime nowUtc,
         int bookingWindowDays,
+        (TimeOnly Start, TimeOnly End) workHours,
         (TimeOnly Start, TimeOnly End)? lunchBreak,
         out string error)
     {
@@ -86,9 +93,9 @@ public static class SlotGrid
             return false;
         }
 
-        if (local.TimeOfDay < WorkStart.ToTimeSpan() || local.TimeOfDay + duration > WorkEnd.ToTimeSpan())
+        if (local.TimeOfDay < workHours.Start.ToTimeSpan() || local.TimeOfDay + duration > workHours.End.ToTimeSpan())
         {
-            error = $"Интервал записи должен целиком помещаться в рабочий день {WorkStart:hh\\:mm}-{WorkEnd:hh\\:mm} по времени владельца";
+            error = $"Интервал записи должен целиком помещаться в рабочий день {workHours.Start:hh\\:mm}-{workHours.End:hh\\:mm} по времени владельца";
             return false;
         }
 

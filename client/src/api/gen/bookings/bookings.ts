@@ -69,7 +69,7 @@ export const getBookingsCreateUrl = () => {
  * Создать запись на выбранный слот (гость).
  * Идемпотентно по заголовку Idempotency-Key: повтор с тем же ключом возвращает первичный результат, дубль не создаётся.
  * При пересечении интервала с существующей записью: 409.
- * Интервал, попадающий в обеденный перерыв владельца, отклоняется: 400.
+ * Интервал, выходящий за рабочий день или попадающий в обеденный перерыв владельца, отклоняется: 400.
  */
 export const bookingsCreate = async (createBookingRequest: CreateBookingRequest, options?: RequestInit): Promise<bookingsCreateResponse> => {
 

@@ -25,7 +25,9 @@ public sealed class CalendarSettingsStore(AppDbContext db, CalendarOptions optio
         settings = new Data.Entities.CalendarSettings
         {
             Id = SettingsRowId,
-            BookingWindowDays = options.DefaultBookingWindowDays
+            BookingWindowDays = options.DefaultBookingWindowDays,
+            WorkStart = options.DefaultWorkStart,
+            WorkEnd = options.DefaultWorkEnd
         };
 
         db.CalendarSettings.Add(settings);
@@ -36,6 +38,14 @@ public sealed class CalendarSettingsStore(AppDbContext db, CalendarOptions optio
 
     public async Task<int> GetBookingWindowDaysAsync(CancellationToken cancellationToken) =>
         (await GetAsync(cancellationToken)).BookingWindowDays;
+
+    /// <summary>Рабочий день по времени владельца: начало и конец сетки слотов.</summary>
+    public async Task<(TimeOnly Start, TimeOnly End)> GetWorkHoursAsync(CancellationToken cancellationToken)
+    {
+        var settings = await GetAsync(cancellationToken);
+
+        return (settings.WorkStart, settings.WorkEnd);
+    }
 
     /// <summary>Обеденный перерыв по времени владельца или null, если он не задан.</summary>
     public async Task<(TimeOnly Start, TimeOnly End)?> GetLunchBreakAsync(CancellationToken cancellationToken)
