@@ -41,3 +41,4 @@ jobs:
           OPENCODE_PERMISSION: '{"external_directory":"allow"}'
         with:
           model: opencode/deepseek-v4-flash
+          share: true

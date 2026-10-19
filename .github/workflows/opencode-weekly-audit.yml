@@ -41,4 +41,5 @@ jobs:
           OPENCODE_PERMISSION: '{"external_directory":"allow"}'
         with:
           model: ${{ inputs.model }}
+          share: true
           prompt: ${{ inputs.prompt }}

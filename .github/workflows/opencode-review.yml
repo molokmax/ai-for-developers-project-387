@@ -29,6 +29,7 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
         with:
           model: opencode/deepseek-v4-flash
+          share: true
           prompt: |
             Review this pull request:
             - Find bugs and risky changes

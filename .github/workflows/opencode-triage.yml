@@ -42,6 +42,7 @@ jobs:
           OPENCODE_PERMISSION: '{"external_directory":"allow"}'
         with:
           model: opencode/deepseek-v4-flash
+          share: true
           prompt: |
             Review this issue. If there's a clear fix or relevant docs:
             - Provide documentation links
