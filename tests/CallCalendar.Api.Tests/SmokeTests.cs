@@ -2,8 +2,11 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using CallCalendar.Api.Data;
+using CallCalendar.Api.Data.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CallCalendar.Api.Tests;
 
@@ -335,6 +338,38 @@ public class SmokeTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
         Assert.NotEmpty(starts);
         Assert.Equal(starts.OrderBy(s => s), starts);
         Assert.All(starts, start => Assert.True(start >= DateTimeOffset.UtcNow.AddMinutes(-1)));
+    }
+
+    [Fact]
+    public async Task Meetings_IncludePastFlagAddsPastBookings()
+    {
+        var client = factory.CreateClient();
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var eventTypeId = db.EventTypes.Select(type => type.Id).First();
+            var pastStart = DateTime.UtcNow.AddDays(-2);
+
+            db.Bookings.Add(new Booking
+            {
+                EventTypeId = eventTypeId,
+                StartUtc = pastStart,
+                EndUtc = pastStart.AddMinutes(30),
+                CustomerName = "Прошлый гость",
+                CustomerEmail = "past@example.com",
+                IdempotencyKey = Guid.NewGuid().ToString()
+            });
+            db.SaveChanges();
+        }
+
+        var upcoming = JsonDocument.Parse(await client.GetStringAsync("/api/meetings"));
+        Assert.DoesNotContain(upcoming.RootElement.EnumerateArray(),
+            item => item.GetProperty("customerEmail").GetString() == "past@example.com");
+
+        var all = JsonDocument.Parse(await client.GetStringAsync("/api/meetings?includePast=true"));
+        Assert.Contains(all.RootElement.EnumerateArray(),
+            item => item.GetProperty("customerEmail").GetString() == "past@example.com");
     }
 
     [Fact]
