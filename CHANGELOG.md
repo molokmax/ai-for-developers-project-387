@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/molokmax/ai-for-developers-project-387/compare/v1.1.0...v1.2.0) (2026-10-19)
+
+
+### Features
+
+* **meetings:** add includePast toggle to meetings list ([b23de1c](https://github.com/molokmax/ai-for-developers-project-387/commit/b23de1c47f1a789ec8265df302c390b942af2de5))
+* **meetings:** add includePast toggle to meetings list ([0a9b494](https://github.com/molokmax/ai-for-developers-project-387/commit/0a9b4942f35c6a2850ea443aa546b80693242c9e))
+
 ## [1.1.0](https://github.com/molokmax/ai-for-developers-project-387/compare/v1.0.0...v1.1.0) (2026-10-18)
 
 
