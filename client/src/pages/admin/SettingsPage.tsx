@@ -22,6 +22,10 @@ const CONTRACT_FIELD_MAP = {
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/
 
+// Сетка слотов строится с шагом 30 минут от начала рабочего дня: начало должно быть выровнено
+const GRID_STEP_MINUTES = 30
+const isOnGrid = (time: string) => Number(time.slice(3, 5)) % GRID_STEP_MINUTES === 0
+
 // Сервер отдаёт plainTime (HH:mm:ss), а TimeInput без секунд работает с HH:mm
 const toInputValue = (value: string | null | undefined) => (value ? value.slice(0, 5) : '')
 // Обратно в контракт: plainTime с секундами
@@ -102,6 +106,9 @@ export default function SettingsPage() {
         workDayValid = false
       } else if (workStart >= workEnd) {
         errors.workEnd = 'Конец рабочего дня должен быть позже начала'
+        workDayValid = false
+      } else if (!isOnGrid(workStart)) {
+        errors.workStart = 'Начало рабочего дня должно быть кратно 30 минутам (например, 09:00 или 09:30)'
         workDayValid = false
       }
     }

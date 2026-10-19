@@ -31,6 +31,7 @@ public sealed class SettingsGetEndpoint(CalendarSettingsStore settings)
     private static string FormatTime(TimeOnly value) =>
         value.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
+    // TODO: две перегрузки FormatTime различаются только nullability; можно оставить одну FormatTime(TimeOnly?)
     private static string? FormatTime(TimeOnly? value) =>
         value?.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 }
@@ -63,7 +64,7 @@ public sealed class SettingsUpdateEndpoint(AppDbContext db, CalendarSettingsStor
     }
 
     /// <summary>
-    /// Рабочий день задаётся обеими границами; начало строго раньше конца.
+    /// Рабочий день задаётся обеими границами; начало строго раньше конца и выровнено на сетку слотов.
     /// </summary>
     private static bool TryResolveWorkHours(
         string? rawStart,
@@ -84,6 +85,12 @@ public sealed class SettingsUpdateEndpoint(AppDbContext db, CalendarSettingsStor
         if (start >= end)
         {
             error = "Начало рабочего дня должно быть раньше его конца";
+            return false;
+        }
+
+        if (!SlotGrid.IsAlignedToGrid(start))
+        {
+            error = $"Начало рабочего дня должно быть кратно {SlotGrid.GridStepMinutes} минутам (например, 09:00 или 09:30)";
             return false;
         }
 

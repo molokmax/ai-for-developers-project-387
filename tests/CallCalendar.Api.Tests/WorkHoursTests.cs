@@ -10,6 +10,10 @@ namespace CallCalendar.Api.Tests;
 /// слоты и записи ограничены рабочим днём, обеденный перерыв должен помещаться в него.
 /// Отдельный класс с собственной фабрикой, чтобы изменение настроек не влияло на прочие тесты.
 /// </summary>
+// TODO: тесты создают БД с нуля, поэтому DEFAULT из миграции AddWorkHours для уже существующей
+// строки настроек не проверяется - добавить тест "БД прошлой версии -> миграция -> workStart == 09:00".
+// TODO: тесты меняют общие настройки и восстанавливают их в finally - при исключении в восстановлении
+// последующие проверки увидят чужие значения; рассмотреть локальный scope/отдельную фабрику на тест.
 public class WorkHoursTests(WebAppFactory factory) : IClassFixture<WebAppFactory>
 {
     // Часовой пояс владельца: Calendar:TimeZone из appsettings.json
@@ -134,6 +138,7 @@ public class WorkHoursTests(WebAppFactory factory) : IClassFixture<WebAppFactory
     [Theory]
     [InlineData("18:00", "09:00")]
     [InlineData("09:00", "09:00")]
+    [InlineData("09:15", "18:00")]
     public async Task Settings_InvalidWorkHours_ReturnsBadRequest(string start, string end)
     {
         var client = factory.CreateClient();
@@ -148,6 +153,30 @@ public class WorkHoursTests(WebAppFactory factory) : IClassFixture<WebAppFactory
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
         Assert.Equal(400, problem.GetProperty("status").GetInt32());
+    }
+
+    [Fact]
+    public async Task Settings_WorkStartNotOnGrid_ReturnsBadRequest()
+    {
+        var client = factory.CreateClient();
+
+        try
+        {
+            var response = await client.PutAsJsonAsync("/api/settings", new
+            {
+                bookingWindowDays = 14,
+                workStart = "09:15",
+                workEnd = "18:00"
+            });
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+            Assert.Contains("кратно", problem.GetProperty("detail").GetString());
+        }
+        finally
+        {
+            await SetWorkHoursAsync(client, new TimeOnly(9, 0), new TimeOnly(18, 0));
+        }
     }
 
     private static Task<HttpResponseMessage> SetWorkHoursAsync(HttpClient client, TimeOnly start, TimeOnly end) =>

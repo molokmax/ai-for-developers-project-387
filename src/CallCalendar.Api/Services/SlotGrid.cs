@@ -15,6 +15,13 @@ public static class SlotGrid
     public static bool IsDurationValid(int minutes) => minutes >= GridStepMinutes && minutes % GridStepMinutes == 0;
 
     /// <summary>
+    /// Время выровнено на сетку слотов: минуты кратны шагу, секунды и миллисекунды равны нулю.
+    /// Границы рабочего дня должны быть выровнены, иначе выданные слоты нельзя забронировать.
+    /// </summary>
+    public static bool IsAlignedToGrid(TimeOnly time) =>
+        time.Minute % GridStepMinutes == 0 && time.Second == 0 && time.Millisecond == 0;
+
+    /// <summary>
     /// Свободные слоты для длительности <paramref name="duration"/> в окне записи
     /// <paramref name="bookingWindowDays"/> календарных дней, включая текущий:
     /// старта на сетке, интервал целиком в рабочем дне <paramref name="workHours"/>, не в прошлом,

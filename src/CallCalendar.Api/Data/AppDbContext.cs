@@ -36,6 +36,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         // Рабочий день добавлен позже остальных полей: для уже существующей строки настроек
         // БД-дефолт сохраняет прежнее поведение (09:00-18:00), владелец может изменить его через API.
+        // TODO: захардкоженные 09:00/18:00 дублируют CalendarOptions.FallbackWorkStart/End;
+        // при смене fallback БД-дефолт отстанет - сослаться на общие константы.
         modelBuilder.Entity<CalendarSettings>(settings =>
         {
             settings.Property(s => s.WorkStart).HasDefaultValue(new TimeOnly(9, 0));

@@ -52,6 +52,12 @@ public sealed class CalendarOptions(
                 $"Некорректный рабочий день: {WorkStartConfigurationKey}='{workStart:HH\\:mm}' должен быть раньше {WorkEndConfigurationKey}='{workEnd:HH\\:mm}'");
         }
 
+        if (!SlotGrid.IsAlignedToGrid(workStart))
+        {
+            throw new InvalidOperationException(
+                $"Некорректный рабочий день: {WorkStartConfigurationKey}='{workStart:HH\\:mm}' должен быть кратен {SlotGrid.GridStepMinutes} минутам");
+        }
+
         return new CalendarOptions(
             TimeZoneInfo.FindSystemTimeZoneById(timeZoneId),
             ReadBookingWindowDays(configuration),
