@@ -136,6 +136,23 @@ describe('SettingsPage (настройки календаря)', () => {
     expect(fetchMock.mock.calls.filter(([, init]) => init?.method === 'PUT')).toHaveLength(0)
   })
 
+  it('не отправляет рабочий день с началом не кратно 30 минутам', async () => {
+    const fetchMock = mockFetch([
+      { url: '/api/settings', status: 200, body: { bookingWindowDays: 14, ...DEFAULT_WORK_DAY } }
+    ])
+
+    renderPage(<SettingsPage />, { route: '/admin/settings', path: '/admin/settings' })
+
+    fireEvent.change(await screen.findByLabelText('Начало рабочего дня'), { target: { value: '09:15' } })
+    fireEvent.change(screen.getByLabelText('Конец рабочего дня'), { target: { value: '18:00' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }))
+
+    expect(
+      await screen.findByText('Начало рабочего дня должно быть кратно 30 минутам (например, 09:00 или 09:30)')
+    ).toBeDefined()
+    expect(fetchMock.mock.calls.filter(([, init]) => init?.method === 'PUT')).toHaveLength(0)
+  })
+
   it('не отправляет перерыв, выходящий за рабочий день', async () => {
     const fetchMock = mockFetch([
       { url: '/api/settings', status: 200, body: { bookingWindowDays: 14, ...DEFAULT_WORK_DAY } }
