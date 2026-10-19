@@ -6,6 +6,7 @@ on:
 
 jobs:
   triage:
+    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') && !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
