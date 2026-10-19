@@ -11,13 +11,18 @@ namespace CallCalendar.Api.Endpoints;
 public sealed class MeetingsListEndpoint(AppDbContext db)
     : Bases.MeetingsListEndpointBase
 {
-    public override async Task<Ok<Dtos.Meeting[]>> HandleAsync(CancellationToken cancellationToken)
+    public override async Task<Ok<Dtos.Meeting[]>> HandleAsync(Parameters parameters, CancellationToken cancellationToken)
     {
         var nowUtc = DateTime.UtcNow;
 
-        var meetings = await db.Bookings
-            .AsNoTracking()
-            .Where(booking => booking.StartUtc >= nowUtc)
+        var query = db.Bookings.AsNoTracking();
+
+        if (parameters.IncludePast != true)
+        {
+            query = query.Where(booking => booking.StartUtc >= nowUtc);
+        }
+
+        var meetings = await query
             .OrderBy(booking => booking.StartUtc)
             .Select(booking => new Dtos.Meeting
             {

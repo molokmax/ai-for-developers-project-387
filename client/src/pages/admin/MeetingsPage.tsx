@@ -1,20 +1,28 @@
-import { Container, Skeleton, Stack, Table, Text, Title } from '@mantine/core'
+import { Container, Skeleton, Stack, Switch, Table, Text, Title } from '@mantine/core'
 import dayjs from 'dayjs'
+import { useState } from 'react'
 import { useMeetingsList } from '../../api/gen'
 
 export default function MeetingsPage() {
-  const { data, isLoading } = useMeetingsList()
+  const [includePast, setIncludePast] = useState(false)
+  const { data, isLoading } = useMeetingsList({ includePast })
   const meetings = data?.data ?? []
 
   return (
     <Container size="md" py="xl">
       <Stack gap="lg">
-        <Title order={1}>Предстоящие встречи</Title>
+        <Title order={1}>Встречи</Title>
+
+        <Switch
+          checked={includePast}
+          onChange={event => setIncludePast(event.currentTarget.checked)}
+          label="Показывать прошедшие"
+        />
 
         {isLoading ? (
           <Skeleton height={200} radius="sm" />
         ) : meetings.length === 0 ? (
-          <Text c="dimmed">Предстоящих встреч нет</Text>
+          <Text c="dimmed">{includePast ? 'Встреч нет' : 'Предстоящих встреч нет'}</Text>
         ) : (
           <Table withTableBorder>
             <Table.Thead>

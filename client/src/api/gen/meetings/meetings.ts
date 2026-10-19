@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Календарь звонков API
  * API сервиса записи на звонок.
- * Гость выбирает тип события и свободный слот в окне записи (настраиваемое число календарных дней, включая текущий; по умолчанию 14), владелец календаря управляет типами событий, настройками и смотрит предстоящие встречи.
+ * Гость выбирает тип события и свободный слот в окне записи (настраиваемое число календарных дней, включая текущий; по умолчанию 14), владелец календаря управляет типами событий, настройками и смотрит предстоящие и прошедшие встречи.
  * Регистрации и авторизации нет: административный раздел работает от имени единственного заранее заданного профиля владельца.
  * Время в API передаётся в UTC (ISO 8601); сетка слотов вычисляется на сервере в часовом поясе владельца (по умолчанию Europe/Moscow).
  * OpenAPI spec version: 0.0.0
@@ -24,7 +24,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  Meeting
+  Meeting,
+  MeetingsListParams
 } from '../model';
 
 
@@ -58,20 +59,28 @@ export type meetingsListResponseSuccess = (meetingsListResponse200) & {
 
 export type meetingsListResponse = (meetingsListResponseSuccess)
 
-export const getMeetingsListUrl = () => {
+export const getMeetingsListUrl = (params?: MeetingsListParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/meetings`
+  return stringifiedParams.length > 0 ? `/api/meetings?${stringifiedParams}` : `/api/meetings`
 }
 
 /**
- * Предстоящие встречи всех типов событий (владелец календаря), сортировка по времени начала; прошедшие не возвращаются
+ * Встречи всех типов событий (владелец календаря), сортировка по времени начала.
+ * По умолчанию возвращаются только предстоящие встречи; includePast=true добавляет прошедшие.
  */
-export const meetingsList = async ( options?: RequestInit): Promise<meetingsListResponse> => {
+export const meetingsList = async (params?: MeetingsListParams, options?: RequestInit): Promise<meetingsListResponse> => {
 
-  const res = await fetch(getMeetingsListUrl(),
+  const res = await fetch(getMeetingsListUrl(params),
   {
     ...options,
     method: 'GET'
@@ -91,23 +100,23 @@ export const meetingsList = async ( options?: RequestInit): Promise<meetingsList
 
 
 
-export const getMeetingsListQueryKey = () => {
+export const getMeetingsListQueryKey = (params?: MeetingsListParams,) => {
     return [
-    `/api/meetings`
+    `/api/meetings`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getMeetingsListQueryOptions = <TData = Awaited<ReturnType<typeof meetingsList>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>>, fetch?: RequestInit}
+export const getMeetingsListQueryOptions = <TData = Awaited<ReturnType<typeof meetingsList>>, TError = unknown>(params?: MeetingsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getMeetingsListQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getMeetingsListQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof meetingsList>>> = ({ signal }) => meetingsList({ signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof meetingsList>>> = ({ signal }) => meetingsList(params, { signal, ...fetchOptions });
 
 
 
@@ -121,7 +130,7 @@ export type MeetingsListQueryError = unknown
 
 
 export function useMeetingsList<TData = Awaited<ReturnType<typeof meetingsList>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>> & Pick<
+ params: undefined |  MeetingsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof meetingsList>>,
           TError,
@@ -131,7 +140,7 @@ export function useMeetingsList<TData = Awaited<ReturnType<typeof meetingsList>>
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMeetingsList<TData = Awaited<ReturnType<typeof meetingsList>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>> & Pick<
+ params?: MeetingsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof meetingsList>>,
           TError,
@@ -141,16 +150,16 @@ export function useMeetingsList<TData = Awaited<ReturnType<typeof meetingsList>>
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useMeetingsList<TData = Awaited<ReturnType<typeof meetingsList>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>>, fetch?: RequestInit}
+ params?: MeetingsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>>, fetch?: RequestInit}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useMeetingsList<TData = Awaited<ReturnType<typeof meetingsList>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>>, fetch?: RequestInit}
+ params?: MeetingsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meetingsList>>, TError, TData>>, fetch?: RequestInit}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getMeetingsListQueryOptions(options)
+  const queryOptions = getMeetingsListQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

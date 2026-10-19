@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 import { mockFetch, renderPage } from '../../test/helpers'
@@ -45,5 +45,19 @@ describe('MeetingsPage (предстоящие встречи)', () => {
     renderPage(<MeetingsPage />, { route: '/admin/meetings', path: '/admin/meetings' })
 
     expect(await screen.findByText('Предстоящих встреч нет')).toBeDefined()
+  })
+
+  it('переключатель включает прошедшие встречи в запросе', async () => {
+    const fetchMock = mockFetch([{ url: '/api/meetings', status: 200, body: meetings }])
+
+    renderPage(<MeetingsPage />, { route: '/admin/meetings', path: '/admin/meetings' })
+
+    expect(await screen.findByText('Иван')).toBeDefined()
+
+    fireEvent.click(screen.getByRole('switch'))
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('includePast=true'), expect.anything())
+    })
   })
 })
